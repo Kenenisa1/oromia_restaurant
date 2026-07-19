@@ -10,6 +10,7 @@ import WaiterCalls from "@/components/admin/WaiterCalls";
 import AdminNavbar from "@/components/admin/AdminNavbar";
 import AdminDailyStockPage from "@/components/admin/AdminDailyStockPage";
 import AdminMenuPage from "@/components/admin/AdminMenuPage";
+import AdminQRCodeGenerator from "@/components/admin/AdminQRCodeGenerator";
 
 interface Category {
   id: string;
@@ -47,7 +48,7 @@ export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passcode, setPasscode] = useState("");
   const [authError, setAuthError] = useState("");
-  const [activeTab, setActiveTab] = useState<"daily-stock" | "menu-items">(
+  const [activeTab, setActiveTab] = useState<"daily-stock" | "menu-items" | "qr-codes">(
     "daily-stock"
   );
 
@@ -254,6 +255,8 @@ export default function AdminPage() {
               onFetchItems={fetchAdminMenuItems}
             />
           )}
+
+          {activeTab === "qr-codes" && <AdminQRCodeGenerator />}
         </div>
       </main>
     </div>

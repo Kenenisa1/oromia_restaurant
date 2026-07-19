@@ -4,8 +4,8 @@ import React from "react";
 import { LogOut } from "lucide-react";
 
 interface AdminNavbarProps {
-  activeTab: "daily-stock" | "menu-items";
-  onTabChange: (tab: "daily-stock" | "menu-items") => void;
+  activeTab: "daily-stock" | "menu-items" | "qr-codes";
+  onTabChange: (tab: "daily-stock" | "menu-items" | "qr-codes") => void;
   onLogout: () => void;
 }
 
@@ -65,6 +65,16 @@ export default function AdminNavbar({
               }`}
             >
               Menu Data
+            </button>
+            <button
+              onClick={() => onTabChange("qr-codes")}
+              className={`flex-1 rounded-xl py-2.5 text-xs sm:text-sm font-bold tracking-wide transition-all duration-300 ${
+                activeTab === "qr-codes"
+                  ? "bg-emerald-500 text-neutral-950 shadow-md shadow-emerald-500/20"
+                  : "text-neutral-400 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              QR Codes
             </button>
           </div>
         </div>
