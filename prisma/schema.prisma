@@ -1,0 +1,94 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Category {
+  id     String     @id @default(auto()) @map("_id") @db.ObjectId
+  slug   String     @unique // e.g., "food", "drinks", "special"
+  
+  // Multilingual category names (e.g., Food / ምግቦች / Nyaata)
+  nameEN String
+  nameAM String
+  nameOR String
+  
+  items  MenuItem[]
+}
+
+model MenuItem {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  
+  // Multilingual Name support
+  nameEN        String
+  nameAM        String
+  nameOR        String
+
+  // Multilingual Description support
+  descEN        String?
+  descAM        String?
+  descOR        String?
+
+  price         Float
+  imageUrl      String
+  
+  // Sub-category for fine filtering (e.g., "breakfast", "lunch", "cold", "hot")
+  subCategory   String      @default("all")
+  
+  // Admin inventory and sales metrics
+  isTrackable   Boolean     @default(false)
+  stockQuantity Int         @default(0)  // Active physical stock left right now
+  isAvailable   Boolean     @default(true)
+  totalSold     Int         @default(0)  // Lifetime total sold
+
+  // --- NEW INVENTORY FIELDS FOR DAILY TRACKING ---
+  morningStock   Int        @default(0)  // Allocated early morning stock capacity
+  totalSoldToday Int        @default(0)  // Real-time counter of units sold today
+
+  categoryId    String      @db.ObjectId
+  category      Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  orderItems    OrderItem[]
+}
+
+model Order {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  tableNumber String
+  status      OrderStatus @default(PENDING)
+  items       OrderItem[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+model OrderItem {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  orderId      String   @db.ObjectId
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItemId   String   @db.ObjectId
+  menuItem     MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  name         String   // Stored at time of order (usually nameEN or active language name)
+  quantity     Int
+  priceAtOrder Float
+}
+
+// --- NEW HISTORICAL DAILY REPORTS MODEL ---
+model DailyReport {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  dateString        String   @unique // Saved as "YYYY-MM-DD" to ensure only one report per day
+  day               Int
+  month             Int
+  year              Int
+  totalRevenue      Float
+  totalItemsSold    Int
+  soldItemsSnapshot String   // Stringified JSON array storing items: [{"id": "...", "nameEN": "Pasta", "qty": 12, "revenue": 1800}]
+  createdAt         DateTime @default(now())
+}
