@@ -6,7 +6,7 @@ import { Bell, Check } from "lucide-react";
 interface WaiterCall {
   id: string;
   tableNumber: string;
-  createdAt: number;
+  createdAt: string | number; 
 }
 
 interface WaiterCallsProps {

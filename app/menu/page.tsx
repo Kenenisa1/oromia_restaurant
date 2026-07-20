@@ -7,14 +7,10 @@ import {
   Bell,
   X,
   Utensils,
-  Coffee,
-  Clock,
   Star,
   ChevronRight,
   User,
   Phone,
-  MapPin,
-  ExternalLink,
 } from "lucide-react";
 
 interface Category {
@@ -79,33 +75,37 @@ export default function CustomerMenuPage() {
     fetchMenu();
   }, []);
 
-  const handleCallWaiter = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!tableNumber) return;
+const handleCallWaiter = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!tableNumber) return;
 
-    setIsSendingCall(true);
-    try {
-      const res = await fetch("/api/admin/notifications", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tableNumber }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setCallSuccess(true);
-        setTimeout(() => {
-          setIsCallingWaiter(false);
-          setCallSuccess(false);
-        }, 3000);
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Failed to call waiter. Please ask staff directly.");
-    } finally {
-      setIsSendingCall(false);
+  setIsSendingCall(true);
+  try {
+    // FIX: Send request to the new database-backed endpoint
+    const res = await fetch("/api/waiter-call", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      // FIX: Map 'tableNumber' from local state to 'tableNo' for your Prisma schema
+      body: JSON.stringify({ tableNo: tableNumber }), 
+    });
+    
+    const data = await res.json();
+    if (data.success) {
+      setCallSuccess(true);
+      setTimeout(() => {
+        setIsCallingWaiter(false);
+        setCallSuccess(false);
+      }, 3000);
+    } else {
+      alert(data.error || "Failed to call waiter.");
     }
-  };
-
+  } catch (err) {
+    console.error(err);
+    alert("Failed to call waiter. Please ask staff directly.");
+  } finally {
+    setIsSendingCall(false);
+  }
+};
   // Filter logic
   const filteredItems = items.filter((item) => {
     const matchesCategory =
