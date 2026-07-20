@@ -92,3 +92,10 @@ model DailyReport {
   soldItemsSnapshot String   // Stringified JSON array storing items: [{"id": "...", "nameEN": "Pasta", "qty": 12, "revenue": 1800}]
   createdAt         DateTime @default(now())
 }
+
+model WaiterCall {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  tableNo   String
+  status    String   @default("pending") // pending, resolved
+  createdAt DateTime @default(now())
+}

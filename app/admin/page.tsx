@@ -38,7 +38,7 @@ interface MenuItem {
 interface WaiterCall {
   id: string;
   tableNumber: string;
-  createdAt: number;
+  createdAt: string | number;
 }
 
 // Global lookup collection to track spoken notifications across asynchronous rendering loops
@@ -98,21 +98,27 @@ export default function AdminPage() {
 
   const fetchActiveCalls = async () => {
     try {
-      const res = await fetch("/api/admin/notifications");
+      // FIX: Pointed to the database-backed endpoint
+      const res = await fetch("/api/waiter-call");
       if (!res.ok) return;
 
       const data = await res.json();
-      if (data.success) {
-        const newCalls: WaiterCall[] = data.calls || [];
+      if (data.success && Array.isArray(data.calls)) {
+        // FIX: Map the schema's 'tableNo' to the component's expected 'tableNumber'
+        const mappedCalls: WaiterCall[] = data.calls.map((call: any) => ({
+          id: call.id,
+          tableNumber: call.tableNo || "N/A",
+          createdAt: call.createdAt,
+        }));
         
         // Immediate defensive lookahead loop using our global tracker
-        newCalls.forEach((incoming) => {
+        mappedCalls.forEach((incoming) => {
           if (!spokenCallIds.has(incoming.id)) {
             triggerVoiceCall(incoming.id, incoming.tableNumber);
           }
         });
 
-        setActiveCalls(newCalls);
+        setActiveCalls(mappedCalls);
       }
     } catch (e) {
       console.log("Active call poll aborted or skipped.");
@@ -141,10 +147,11 @@ export default function AdminPage() {
         window.speechSynthesis.cancel();
       }
 
-      const res = await fetch("/api/admin/notifications", {
+      // FIX: Standardized method logic to cleanly handle inline PUT changes to our schema status fields
+      const res = await fetch("/api/waiter-call", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({ id, status: "resolved" }),
       });
       const data = await res.json();
       if (data.success) {
