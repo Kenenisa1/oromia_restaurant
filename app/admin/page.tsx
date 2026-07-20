@@ -41,6 +41,9 @@ interface WaiterCall {
   createdAt: number;
 }
 
+// Global lookup collection to track spoken notifications across asynchronous rendering loops
+const spokenCallIds = new Set<string>();
+
 export default function AdminPage() {
   const [items, setItems] = useState<MenuItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -101,23 +104,29 @@ export default function AdminPage() {
       const data = await res.json();
       if (data.success) {
         const newCalls: WaiterCall[] = data.calls || [];
-        setActiveCalls((prev) => {
-          newCalls.forEach((incoming) => {
-            if (!prev.some((existing) => existing.id === incoming.id)) {
-              triggerVoiceCall(incoming.tableNumber);
-            }
-          });
-          return newCalls;
+        
+        // Immediate defensive lookahead loop using our global tracker
+        newCalls.forEach((incoming) => {
+          if (!spokenCallIds.has(incoming.id)) {
+            triggerVoiceCall(incoming.id, incoming.tableNumber);
+          }
         });
+
+        setActiveCalls(newCalls);
       }
     } catch (e) {
       console.log("Active call poll aborted or skipped.");
     }
   };
 
-  const triggerVoiceCall = (tableNum: string) => {
+  const triggerVoiceCall = (id: string, tableNum: string) => {
     if (typeof window !== "undefined" && window.speechSynthesis) {
+      // 1. Instantly register that this tracking key has been verbalized
+      spokenCallIds.add(id);
+
+      // 2. Clear out any previous audio queue chunks to prevent backlog stuttering
       window.speechSynthesis.cancel();
+      
       const alertPhrase = `Table number ${tableNum} is calling the waiter.`;
       const utterance = new SpeechSynthesisUtterance(alertPhrase);
       utterance.rate = 0.95;
@@ -127,6 +136,11 @@ export default function AdminPage() {
 
   const handleResolveCall = async (id: string) => {
     try {
+      // Force cancel speaking streams immediately when the manager asserts resolution
+      if (typeof window !== "undefined" && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+
       const res = await fetch("/api/admin/notifications", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -141,12 +155,6 @@ export default function AdminPage() {
       console.error(e);
     }
   };
-
-  // Safe Double-Tap Real-time Manual Sale Logging - MOVED TO AdminDailyStockPage
-
-  // Morning Inventory Stock Setup - MOVED TO AdminDailyStockPage
-
-  // Daily Closeout Ledger Trigger - MOVED TO AdminDailyStockPage
 
   // Check if already authenticated from previous session
   useEffect(() => {
@@ -177,7 +185,6 @@ export default function AdminPage() {
     if (!isAuthenticated) return;
 
     const pollInterval = setInterval(() => {
-      // Silently fetch items without triggering full-page loading spinner
       fetchAdminMenuItems(true).catch(console.error);
       fetchActiveCalls().catch(console.error);
     }, 3000); // Sync every 3 seconds for near-instant updates
@@ -204,8 +211,6 @@ export default function AdminPage() {
     sessionStorage.removeItem("admin_auth");
     toast.success("Logged out successfully!");
   };
-
-  // No duplicate polling effect needed here; the watcher above handles it.
 
   if (isLoading) {
     return (
