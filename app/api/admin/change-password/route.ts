@@ -10,14 +10,14 @@ export async function POST(request: NextRequest) {
     if (!currentPassword || !newPassword) {
       return NextResponse.json(
         { success: false, message: "Current and new passwords are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (newPassword.length < 6) {
       return NextResponse.json(
         { success: false, message: "Password must be at least 6 characters" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     if (currentPassword !== currentEnvPassword) {
       return NextResponse.json(
         { success: false, message: "Current password is incorrect" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -61,13 +61,14 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Password changed successfully. Please restart the server for changes to take effect.",
+      message:
+        "Password changed successfully. Please restart the server for changes to take effect.",
     });
   } catch (error) {
     console.error("Error changing password:", error);
     return NextResponse.json(
       { success: false, message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

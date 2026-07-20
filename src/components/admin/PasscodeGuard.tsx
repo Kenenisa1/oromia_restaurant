@@ -23,7 +23,6 @@ export default function PasscodeGuard({
       <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-emerald-700/10 blur-[80px] pointer-events-none" />
 
       <div className="w-full max-w-xs glass-card rounded-[32px] p-8 text-center space-y-7 border border-white/10 shadow-2xl shadow-black/50 relative z-10">
-
         {/* Brand + Icon */}
         <div className="flex flex-col items-center gap-4">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/30">
