@@ -49,7 +49,9 @@ export default function AdminMenuPage({
   };
 
   const handleToggleVisibility = async (item: MenuItem) => {
-    const toastId = toast.loading(item.isAvailable ? "Hiding item..." : "Showing item...");
+    const toastId = toast.loading(
+      item.isAvailable ? "Hiding item..." : "Showing item...",
+    );
     try {
       const res = await fetch(`/api/menu/${item.id}`, {
         method: "PUT",
@@ -59,12 +61,16 @@ export default function AdminMenuPage({
       const data = await res.json();
       if (data.success) {
         toast.success(
-          item.isAvailable ? `"${item.nameEN}" hidden from menu.` : `"${item.nameEN}" is now visible.`,
-          { id: toastId }
+          item.isAvailable
+            ? `"${item.nameEN}" hidden from menu.`
+            : `"${item.nameEN}" is now visible.`,
+          { id: toastId },
         );
         await onFetchItems();
       } else {
-        toast.error(data.error || "Could not update visibility.", { id: toastId });
+        toast.error(data.error || "Could not update visibility.", {
+          id: toastId,
+        });
       }
     } catch {
       toast.error("Failed to connect to the server.", { id: toastId });
@@ -198,15 +204,23 @@ export default function AdminMenuPage({
                 <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="text-center">
-                      <p className="text-[9px] uppercase tracking-wider text-neutral-500 font-bold">Stock</p>
-                      <p className={`text-sm font-black ${item.stockQuantity > 0 ? "text-emerald-300" : "text-rose-400"}`}>
+                      <p className="text-[9px] uppercase tracking-wider text-neutral-500 font-bold">
+                        Stock
+                      </p>
+                      <p
+                        className={`text-sm font-black ${item.stockQuantity > 0 ? "text-emerald-300" : "text-rose-400"}`}
+                      >
                         {item.stockQuantity}
                       </p>
                     </div>
                     <div className="w-px h-6 bg-white/10" />
                     <div className="text-center">
-                      <p className="text-[9px] uppercase tracking-wider text-neutral-500 font-bold">Sold</p>
-                      <p className="text-sm font-black text-white">{item.totalSold}</p>
+                      <p className="text-[9px] uppercase tracking-wider text-neutral-500 font-bold">
+                        Sold
+                      </p>
+                      <p className="text-sm font-black text-white">
+                        {item.totalSold}
+                      </p>
                     </div>
                   </div>
 
@@ -225,9 +239,15 @@ export default function AdminMenuPage({
                           ? "glass-panel text-neutral-400 hover:bg-amber-500/20 hover:text-amber-300"
                           : "bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-neutral-950"
                       }`}
-                      title={item.isAvailable ? "Hide from menu" : "Show on menu"}
+                      title={
+                        item.isAvailable ? "Hide from menu" : "Show on menu"
+                      }
                     >
-                      {item.isAvailable ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                      {item.isAvailable ? (
+                        <Eye className="w-4 h-4" />
+                      ) : (
+                        <EyeOff className="w-4 h-4" />
+                      )}
                     </button>
                     <button
                       onClick={() => handleDeleteItem(item.id, item.nameEN)}
@@ -245,7 +265,9 @@ export default function AdminMenuPage({
               <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
                 <Plus className="w-8 h-8 text-neutral-500" />
               </div>
-              <h3 className="text-lg font-black text-white mb-1">No items yet</h3>
+              <h3 className="text-lg font-black text-white mb-1">
+                No items yet
+              </h3>
               <p className="text-sm text-neutral-400 font-medium mb-6">
                 This category is currently empty.
               </p>

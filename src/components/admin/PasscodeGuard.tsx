@@ -45,9 +45,7 @@ export default function PasscodeGuard({
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 pointer-events-none" />
             <input
               type="password"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              placeholder="Enter passcode"
+              placeholder="Enter password"
               value={passcode}
               onChange={(e) => setPasscode(e.target.value)}
               className="w-full text-center tracking-[0.5em] text-lg font-black pl-10 pr-4 py-4 bg-black/40 border border-white/10 rounded-2xl focus:outline-none focus:border-emerald-500/70 focus:bg-black/60 text-neutral-100 placeholder:tracking-normal placeholder:text-neutral-600 transition-all"
@@ -77,4 +75,4 @@ export default function PasscodeGuard({
       </div>
     </main>
   );
-}
+}

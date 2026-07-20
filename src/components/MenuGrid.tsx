@@ -172,7 +172,9 @@ export default function MenuGrid() {
                 </span>
                 <span className="text-sm font-black text-emerald-400 drop-shadow-md">
                   {item.price}{" "}
-                  <span className="text-[10px] font-medium text-emerald-300/80">{t.etb}</span>
+                  <span className="text-[10px] font-medium text-emerald-300/80">
+                    {t.etb}
+                  </span>
                 </span>
               </div>
             </div>

@@ -128,9 +128,7 @@ export default function HeroSection() {
                   : "BAGA NAGAAN DHUFTAN"}
             </span>
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-none drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)]">
-              <span className="text-gradient">
-                OROMIA GARDEN
-              </span>
+              <span className="text-gradient">OROMIA GARDEN</span>
             </h1>
             <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-wide text-white/90 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] block">
               RESTAURANT

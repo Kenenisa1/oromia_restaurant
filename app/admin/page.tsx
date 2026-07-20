@@ -11,6 +11,7 @@ import AdminNavbar from "@/components/admin/AdminNavbar";
 import AdminDailyStockPage from "@/components/admin/AdminDailyStockPage";
 import AdminMenuPage from "@/components/admin/AdminMenuPage";
 import AdminQRCodeGenerator from "@/components/admin/AdminQRCodeGenerator";
+import PasswordChangeModal from "@/components/admin/PasswordChangeModal";
 
 interface Category {
   id: string;
@@ -48,13 +49,15 @@ export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passcode, setPasscode] = useState("");
   const [authError, setAuthError] = useState("");
-  const [activeTab, setActiveTab] = useState<"daily-stock" | "menu-items" | "qr-codes">(
-    "daily-stock"
-  );
+  const [activeTab, setActiveTab] = useState<
+    "daily-stock" | "menu-items" | "qr-codes"
+  >("daily-stock");
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
   const fetchAdminMenuItems = async (silent = false) => {
     try {
-      if (!silent) console.log("🔄 Fetching menu items from /api/menu?category=all");
+      if (!silent)
+        console.log("🔄 Fetching menu items from /api/menu?category=all");
       const res = await fetch("/api/menu?category=all");
       if (!res.ok) throw new Error("Server returned non-200");
       const data = await res.json();
@@ -172,7 +175,7 @@ export default function AdminPage() {
   // Real-time silent sync (simulates socket updates for the frontend)
   useEffect(() => {
     if (!isAuthenticated) return;
-    
+
     const pollInterval = setInterval(() => {
       // Silently fetch items without triggering full-page loading spinner
       fetchAdminMenuItems(true).catch(console.error);
@@ -231,6 +234,14 @@ export default function AdminPage() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         onLogout={handleLogout}
+        onSettingsClick={() => setIsPasswordModalOpen(true)}
+      />
+
+      {/* Password Change Modal */}
+      <PasswordChangeModal
+        isOpen={isPasswordModalOpen}
+        onClose={() => setIsPasswordModalOpen(false)}
+        currentPassword={passcode}
       />
 
       {/* Main Content */}

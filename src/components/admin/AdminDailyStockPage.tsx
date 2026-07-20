@@ -54,10 +54,13 @@ export default function AdminDailyStockPage({
 
   const categorySlugById = useMemo(
     () =>
-      categories.reduce((acc, category) => {
-        acc[category.id] = category.slug;
-        return acc;
-      }, {} as Record<string, string>),
+      categories.reduce(
+        (acc, category) => {
+          acc[category.id] = category.slug;
+          return acc;
+        },
+        {} as Record<string, string>,
+      ),
     [categories],
   );
 
@@ -68,10 +71,22 @@ export default function AdminDailyStockPage({
     );
   }, [items, categorySlugById, selectedFilter]);
 
-  const totalStock = useMemo(() => items.reduce((sum, i) => sum + i.stockQuantity, 0), [items]);
-  const totalValue = useMemo(() => items.reduce((sum, i) => sum + i.stockQuantity * i.price, 0), [items]);
-  const totalSoldToday = useMemo(() => items.reduce((sum, i) => sum + i.totalSoldToday, 0), [items]);
-  const totalRevenueToday = useMemo(() => items.reduce((sum, i) => sum + i.totalSoldToday * i.price, 0), [items]);
+  const totalStock = useMemo(
+    () => items.reduce((sum, i) => sum + i.stockQuantity, 0),
+    [items],
+  );
+  const totalValue = useMemo(
+    () => items.reduce((sum, i) => sum + i.stockQuantity * i.price, 0),
+    [items],
+  );
+  const totalSoldToday = useMemo(
+    () => items.reduce((sum, i) => sum + i.totalSoldToday, 0),
+    [items],
+  );
+  const totalRevenueToday = useMemo(
+    () => items.reduce((sum, i) => sum + i.totalSoldToday * i.price, 0),
+    [items],
+  );
 
   // Open modal: snapshot current DB values - NOT linked to polling updates
   const handleOpenStockModal = () => {
@@ -89,7 +104,8 @@ export default function AdminDailyStockPage({
       const stockData: Record<string, number> = {};
       items.forEach((item) => {
         const raw = stockInputs[item.id] ?? "";
-        const parsed = raw === "" || isNaN(Number(raw)) ? 0 : Math.max(0, Number(raw));
+        const parsed =
+          raw === "" || isNaN(Number(raw)) ? 0 : Math.max(0, Number(raw));
         stockData[item.id] = parsed;
       });
 
@@ -99,7 +115,8 @@ export default function AdminDailyStockPage({
         body: JSON.stringify({ stockData }),
       });
       const data = await res.json();
-      if (!res.ok || !data.success) throw new Error(data.error || "Could not save.");
+      if (!res.ok || !data.success)
+        throw new Error(data.error || "Could not save.");
       toast.success("Stock updated!");
       setIsStockModalOpen(false);
       await onFetchItems();
@@ -112,7 +129,10 @@ export default function AdminDailyStockPage({
 
   const handleSaveInlineEdit = async (item: MenuItem) => {
     const val = parseInt(editingStockValue, 10);
-    if (isNaN(val) || val < 0) { toast.error("Enter a valid number."); return; }
+    if (isNaN(val) || val < 0) {
+      toast.error("Enter a valid number.");
+      return;
+    }
     setIsBusy(true);
     try {
       const res = await fetch("/api/admin/daily-report", {
@@ -121,7 +141,8 @@ export default function AdminDailyStockPage({
         body: JSON.stringify({ stockData: { [item.id]: val } }),
       });
       const data = await res.json();
-      if (!res.ok || !data.success) throw new Error(data.error || "Could not update.");
+      if (!res.ok || !data.success)
+        throw new Error(data.error || "Could not update.");
       toast.success(`${item.nameEN} → ${val} units`);
       setEditingStockId(null);
       await onFetchItems();
@@ -141,7 +162,8 @@ export default function AdminDailyStockPage({
         body: JSON.stringify({ stockData: { [item.id]: 0 } }),
       });
       const data = await res.json();
-      if (!res.ok || !data.success) throw new Error(data.error || "Could not clear.");
+      if (!res.ok || !data.success)
+        throw new Error(data.error || "Could not clear.");
       toast.success(`${item.nameEN} cleared.`);
       await onFetchItems();
     } catch (error) {
@@ -155,7 +177,10 @@ export default function AdminDailyStockPage({
     if (item.stockQuantity <= 0) return;
     if (confirmingSell !== item.id) {
       setConfirmingSell(item.id);
-      setTimeout(() => setConfirmingSell((c) => (c === item.id ? null : c)), 3000);
+      setTimeout(
+        () => setConfirmingSell((c) => (c === item.id ? null : c)),
+        3000,
+      );
       return;
     }
     setConfirmingSell(null);
@@ -171,15 +196,23 @@ export default function AdminDailyStockPage({
         body: JSON.stringify({ id: item.id }),
       });
       const data = await res.json();
-      if (!res.ok || !data.success) throw new Error(data.error || "Could not deduct.");
+      if (!res.ok || !data.success)
+        throw new Error(data.error || "Could not deduct.");
       toast.custom(
         (t) => (
           <div className="flex items-center justify-between gap-4 rounded-2xl glass-card bg-neutral-900/90 p-4 shadow-xl border border-white/10">
-            <span className="text-sm font-bold text-white">Sold 1 <span className="text-emerald-400">{item.nameEN}</span></span>
+            <span className="text-sm font-bold text-white">
+              Sold 1 <span className="text-emerald-400">{item.nameEN}</span>
+            </span>
             <button
-              onClick={async () => { toast.dismiss(t.id); await handleUndoSale(item); }}
+              onClick={async () => {
+                toast.dismiss(t.id);
+                await handleUndoSale(item);
+              }}
               className="rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider hover:bg-rose-500 hover:text-white transition"
-            >Undo</button>
+            >
+              Undo
+            </button>
           </div>
         ),
         { duration: 4000 },
@@ -201,7 +234,8 @@ export default function AdminDailyStockPage({
         body: JSON.stringify({ id: item.id }),
       });
       const data = await res.json();
-      if (!res.ok || !data.success) throw new Error(data.error || "Could not restore.");
+      if (!res.ok || !data.success)
+        throw new Error(data.error || "Could not restore.");
       toast.success("Order reversed.");
       await onFetchItems();
     } catch (error) {
@@ -217,7 +251,8 @@ export default function AdminDailyStockPage({
     try {
       const res = await fetch("/api/admin/daily-report", { method: "POST" });
       const data = await res.json();
-      if (!res.ok || !data.success) throw new Error(data.error || "Could not close.");
+      if (!res.ok || !data.success)
+        throw new Error(data.error || "Could not close.");
       toast.success("Daily stock closed.");
       await onFetchItems();
     } catch (error) {
@@ -233,20 +268,33 @@ export default function AdminDailyStockPage({
       <section className="glass-card rounded-[28px] p-4">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="rounded-2xl bg-white/5 border border-white/5 p-3">
-            <p className="text-[9px] uppercase tracking-widest text-neutral-500 font-bold mb-1">Total Stock</p>
+            <p className="text-[9px] uppercase tracking-widest text-neutral-500 font-bold mb-1">
+              Total Stock
+            </p>
             <p className="text-xl font-black text-white">{totalStock}</p>
           </div>
           <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-3">
-            <p className="text-[9px] uppercase tracking-widest text-emerald-400 font-bold mb-1">Stock Value</p>
-            <p className="text-xl font-black text-emerald-400">{totalValue.toLocaleString()} <span className="text-xs">ETB</span></p>
+            <p className="text-[9px] uppercase tracking-widest text-emerald-400 font-bold mb-1">
+              Stock Value
+            </p>
+            <p className="text-xl font-black text-emerald-400">
+              {totalValue.toLocaleString()} <span className="text-xs">ETB</span>
+            </p>
           </div>
           <div className="rounded-2xl bg-white/5 border border-white/5 p-3">
-            <p className="text-[9px] uppercase tracking-widest text-neutral-500 font-bold mb-1">Sold Today</p>
+            <p className="text-[9px] uppercase tracking-widest text-neutral-500 font-bold mb-1">
+              Sold Today
+            </p>
             <p className="text-xl font-black text-white">{totalSoldToday}</p>
           </div>
           <div className="rounded-2xl bg-amber-500/10 border border-amber-500/20 p-3">
-            <p className="text-[9px] uppercase tracking-widest text-amber-400 font-bold mb-1">Revenue</p>
-            <p className="text-xl font-black text-amber-400">{totalRevenueToday.toLocaleString()} <span className="text-xs">ETB</span></p>
+            <p className="text-[9px] uppercase tracking-widest text-amber-400 font-bold mb-1">
+              Revenue
+            </p>
+            <p className="text-xl font-black text-amber-400">
+              {totalRevenueToday.toLocaleString()}{" "}
+              <span className="text-xs">ETB</span>
+            </p>
           </div>
         </div>
 
@@ -261,20 +309,26 @@ export default function AdminDailyStockPage({
                     ? "bg-white text-neutral-950 shadow"
                     : "bg-white/5 text-neutral-400 hover:bg-white/10 hover:text-white"
                 }`}
-              >{opt.label}</button>
+              >
+                {opt.label}
+              </button>
             ))}
           </div>
           <button
             onClick={handleOpenStockModal}
             className="shrink-0 rounded-full bg-emerald-500 px-4 py-2 text-xs font-black uppercase tracking-wider text-neutral-950 shadow-lg shadow-emerald-500/20 hover:scale-105 transition-transform"
-          >+ Stock</button>
+          >
+            + Stock
+          </button>
         </div>
       </section>
 
       {/* Stock Item List */}
       <div className="space-y-2">
         {filteredItems.length === 0 ? (
-          <div className="rounded-3xl glass-panel p-8 text-center text-neutral-400 text-sm">No items in this category.</div>
+          <div className="rounded-3xl glass-panel p-8 text-center text-neutral-400 text-sm">
+            No items in this category.
+          </div>
         ) : (
           filteredItems.map((item) => {
             const isConfirming = confirmingSell === item.id;
@@ -282,10 +336,18 @@ export default function AdminDailyStockPage({
             const isEditing = editingStockId === item.id;
 
             return (
-              <div key={item.id} className={`glass-card rounded-2xl px-4 py-3 flex items-center gap-3 transition-all ${isDepleted ? "opacity-60" : ""}`}>
+              <div
+                key={item.id}
+                className={`glass-card rounded-2xl px-4 py-3 flex items-center gap-3 transition-all ${isDepleted ? "opacity-60" : ""}`}
+              >
                 <div className="flex-1 min-w-0">
-                  <p className="font-black text-white text-sm truncate">{item.nameEN}</p>
-                  <p className="text-[10px] text-neutral-500">{item.price} ETB each &bull; Sold today: {item.totalSoldToday}</p>
+                  <p className="font-black text-white text-sm truncate">
+                    {item.nameEN}
+                  </p>
+                  <p className="text-[10px] text-neutral-500">
+                    {item.price} ETB each &bull; Sold today:{" "}
+                    {item.totalSoldToday}
+                  </p>
                 </div>
 
                 {isEditing ? (
@@ -302,42 +364,61 @@ export default function AdminDailyStockPage({
                       }}
                       className="w-16 rounded-xl border border-emerald-500/40 bg-black/60 px-2 py-1.5 text-center text-sm font-black text-white outline-none focus:border-emerald-400"
                     />
-                    <button onClick={() => handleSaveInlineEdit(item)} disabled={isBusy}
-                      className="w-8 h-8 rounded-xl bg-emerald-500 flex items-center justify-center text-neutral-950 hover:bg-emerald-400 transition">
+                    <button
+                      onClick={() => handleSaveInlineEdit(item)}
+                      disabled={isBusy}
+                      className="w-8 h-8 rounded-xl bg-emerald-500 flex items-center justify-center text-neutral-950 hover:bg-emerald-400 transition"
+                    >
                       <Check className="w-4 h-4" />
                     </button>
-                    <button onClick={() => setEditingStockId(null)}
-                      className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center text-neutral-400 hover:bg-white/10 transition">
+                    <button
+                      onClick={() => setEditingStockId(null)}
+                      className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center text-neutral-400 hover:bg-white/10 transition"
+                    >
                       <X className="w-4 h-4" />
                     </button>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className={`text-lg font-black min-w-[2rem] text-center ${isDepleted ? "text-rose-400" : "text-emerald-400"}`}>
+                    <span
+                      className={`text-lg font-black min-w-[2rem] text-center ${isDepleted ? "text-rose-400" : "text-emerald-400"}`}
+                    >
                       {item.stockQuantity}
                     </span>
                     <button
-                      onClick={() => { setEditingStockId(item.id); setEditingStockValue(String(item.stockQuantity)); }}
+                      onClick={() => {
+                        setEditingStockId(item.id);
+                        setEditingStockValue(String(item.stockQuantity));
+                      }}
                       className="w-8 h-8 rounded-xl glass-panel flex items-center justify-center text-neutral-400 hover:text-emerald-400 transition"
-                      title="Edit stock">
+                      title="Edit stock"
+                    >
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => handleDeleteStock(item)}
                       disabled={isBusy || isDepleted}
                       className="w-8 h-8 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 hover:bg-rose-500 hover:text-white transition disabled:opacity-30"
-                      title="Clear stock">
+                      title="Clear stock"
+                    >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => handleSellClick(item)}
                       disabled={isDepleted || isBusy}
                       className={`rounded-xl px-3 py-2 text-xs font-black uppercase tracking-wide transition-all duration-200 min-w-[72px] ${
-                        isDepleted ? "bg-neutral-900 border border-neutral-800 text-neutral-600 cursor-not-allowed"
-                        : isConfirming ? "bg-rose-500 text-white shadow-[0_0_12px_rgba(244,63,94,0.4)]"
-                        : "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-neutral-950"
-                      }`}>
-                      {isDepleted ? "Empty" : isConfirming ? "Confirm?" : "− Sell"}
+                        isDepleted
+                          ? "bg-neutral-900 border border-neutral-800 text-neutral-600 cursor-not-allowed"
+                          : isConfirming
+                            ? "bg-rose-500 text-white shadow-[0_0_12px_rgba(244,63,94,0.4)]"
+                            : "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-neutral-950"
+                      }`}
+                    >
+                      {isDepleted
+                        ? "Empty"
+                        : isConfirming
+                          ? "Confirm?"
+                          : "− Sell"}
                     </button>
                   </div>
                 )}
@@ -348,8 +429,11 @@ export default function AdminDailyStockPage({
       </div>
 
       <div className="flex justify-center pt-4">
-        <button onClick={handleCloseDailyStock} disabled={isBusy}
-          className="rounded-full bg-rose-500/10 border border-rose-500/30 px-6 py-3 text-xs font-black uppercase tracking-widest text-rose-400 hover:bg-rose-500 hover:text-white transition disabled:opacity-40">
+        <button
+          onClick={handleCloseDailyStock}
+          disabled={isBusy}
+          className="rounded-full bg-rose-500/10 border border-rose-500/30 px-6 py-3 text-xs font-black uppercase tracking-widest text-rose-400 hover:bg-rose-500 hover:text-white transition disabled:opacity-40"
+        >
           Close Daily Stock
         </button>
       </div>
@@ -360,21 +444,34 @@ export default function AdminDailyStockPage({
           <div className="relative w-full max-w-md overflow-hidden rounded-t-[36px] sm:rounded-[32px] glass-card bg-neutral-950/95 p-5 sm:p-8 max-h-[90vh] flex flex-col slide-up-animation border-t border-white/10">
             <div className="flex justify-between items-center mb-5">
               <div>
-                <h2 className="text-xl font-black text-white">Set Morning Stock</h2>
-                <p className="text-[11px] text-neutral-400 mt-0.5">Enter quantities for each item.</p>
+                <h2 className="text-xl font-black text-white">
+                  Set Morning Stock
+                </h2>
+                <p className="text-[11px] text-neutral-400 mt-0.5">
+                  Enter quantities for each item.
+                </p>
               </div>
-              <button onClick={() => setIsStockModalOpen(false)}
-                className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-white/10 transition">
+              <button
+                onClick={() => setIsStockModalOpen(false)}
+                className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-white/10 transition"
+              >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <div className="flex-1 overflow-y-auto space-y-2 custom-scrollbar mb-5">
               {items.map((item) => (
-                <div key={item.id} className="flex items-center justify-between p-3 rounded-2xl bg-white/5 border border-white/5">
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between p-3 rounded-2xl bg-white/5 border border-white/5"
+                >
                   <div className="truncate pr-4">
-                    <p className="font-bold text-sm text-white truncate">{item.nameEN}</p>
-                    <p className="text-[10px] text-emerald-400">{item.price} ETB</p>
+                    <p className="font-bold text-sm text-white truncate">
+                      {item.nameEN}
+                    </p>
+                    <p className="text-[10px] text-emerald-400">
+                      {item.price} ETB
+                    </p>
                   </div>
                   <input
                     type="number"
@@ -383,7 +480,10 @@ export default function AdminDailyStockPage({
                     placeholder="0"
                     value={stockInputs[item.id] ?? ""}
                     onChange={(e) =>
-                      setStockInputs((prev) => ({ ...prev, [item.id]: e.target.value }))
+                      setStockInputs((prev) => ({
+                        ...prev,
+                        [item.id]: e.target.value,
+                      }))
                     }
                     className="w-20 rounded-xl border border-white/10 bg-black/50 px-3 py-2 text-right text-sm font-bold text-white outline-none focus:border-emerald-500 transition-colors"
                   />
@@ -392,8 +492,11 @@ export default function AdminDailyStockPage({
             </div>
 
             <div className="border-t border-white/10 pt-4">
-              <button onClick={handleSaveStock} disabled={isBusy}
-                className="w-full rounded-full bg-emerald-500 py-4 text-sm font-black uppercase tracking-widest text-neutral-950 shadow-xl shadow-emerald-500/20 hover:bg-emerald-400 transition disabled:opacity-50">
+              <button
+                onClick={handleSaveStock}
+                disabled={isBusy}
+                className="w-full rounded-full bg-emerald-500 py-4 text-sm font-black uppercase tracking-widest text-neutral-950 shadow-xl shadow-emerald-500/20 hover:bg-emerald-400 transition disabled:opacity-50"
+              >
                 {isBusy ? "Saving..." : "Save Stock"}
               </button>
             </div>

@@ -1,18 +1,20 @@
 "use client";
 
 import React from "react";
-import { LogOut } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 
 interface AdminNavbarProps {
   activeTab: "daily-stock" | "menu-items" | "qr-codes";
   onTabChange: (tab: "daily-stock" | "menu-items" | "qr-codes") => void;
   onLogout: () => void;
+  onSettingsClick?: () => void;
 }
 
 export default function AdminNavbar({
   activeTab,
   onTabChange,
   onLogout,
+  onSettingsClick,
 }: AdminNavbarProps) {
   return (
     <nav className="sticky top-0 z-40 bg-neutral-950/80 backdrop-blur-xl border-b border-white/5 shadow-xl">
@@ -34,14 +36,30 @@ export default function AdminNavbar({
               </div>
             </div>
 
-            <button
-              onClick={onLogout}
-              className="flex items-center justify-center w-10 h-10 sm:w-auto sm:px-4 sm:py-2 rounded-xl sm:rounded-full bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white transition-all duration-300 shadow-md border border-rose-500/20"
-              title="Logout"
-            >
-              <LogOut className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline text-sm font-bold tracking-wider">LOGOUT</span>
-            </button>
+            <div className="flex gap-2">
+              {onSettingsClick && (
+                <button
+                  onClick={onSettingsClick}
+                  className="flex items-center justify-center w-10 h-10 sm:w-auto sm:px-4 sm:py-2 rounded-xl sm:rounded-full bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white transition-all duration-300 shadow-md border border-blue-500/20"
+                  title="Settings"
+                >
+                  <Settings className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline text-sm font-bold tracking-wider">
+                    SETTINGS
+                  </span>
+                </button>
+              )}
+              <button
+                onClick={onLogout}
+                className="flex items-center justify-center w-10 h-10 sm:w-auto sm:px-4 sm:py-2 rounded-xl sm:rounded-full bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white transition-all duration-300 shadow-md border border-rose-500/20"
+                title="Logout"
+              >
+                <LogOut className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline text-sm font-bold tracking-wider">
+                  LOGOUT
+                </span>
+              </button>
+            </div>
           </div>
 
           {/* Bottom Row: Tab Switchers */}
