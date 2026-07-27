@@ -156,10 +156,16 @@ export default function ClientHomePage() {
   // Filtering based on active Subcategories
   const filteredItems = items.filter((item) => {
     if (subCategory === "all") return true;
-    return (
-      item.subCategory.toLowerCase() === subCategory.toLowerCase() ||
-      item.subCategory.toLowerCase() === "common"
-    );
+
+    const isDrinkTab = ["cold", "hot"].includes(subCategory.toLowerCase());
+    const isCommon = item.subCategory.toLowerCase() === "common";
+
+    if (isCommon) {
+      // Common items only propagate to time-based tabs (breakfast, lunch, dinner, snack)
+      return !isDrinkTab;
+    }
+
+    return item.subCategory.toLowerCase() === subCategory.toLowerCase();
   });
 
   return (
@@ -305,9 +311,6 @@ export default function ClientHomePage() {
                   <div className="flex items-center justify-between mt-4 px-1.5">
                     <span className="text-xs font-black text-emerald-400">
                       {item.price} <span className="text-[9px] font-bold">{currentT.currency}</span>
-                    </span>
-                    <span className="text-[9px] px-2 py-0.5 bg-neutral-950 border border-neutral-850 text-neutral-400 rounded-md font-bold uppercase tracking-widest scale-90">
-                      {item.subCategory}
                     </span>
                   </div>
                 </div>
