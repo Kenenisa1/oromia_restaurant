@@ -99,3 +99,9 @@ model WaiterCall {
   status    String   @default("pending") // pending, resolved
   createdAt DateTime @default(now())
 }
+
+model Settings {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  key   String @unique // e.g., "admin_passcode"
+  value String
+}
