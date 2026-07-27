@@ -1,25 +1,18 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 const prisma = globalForPrisma.prisma || new PrismaClient();
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
-export async function POST(request: NextRequest) {
+export async function PUT(request: Request) {
   try {
     const { currentPassword, newPassword } = await request.json();
 
     if (!currentPassword || !newPassword) {
       return NextResponse.json(
-        { success: false, message: "Current and new passwords are required" },
-        { status: 400 },
-      );
-    }
-
-    if (newPassword.length < 6) {
-      return NextResponse.json(
-        { success: false, message: "Password must be at least 6 characters" },
-        { status: 400 },
+        { success: false, error: "Both current and new passwords are required." },
+        { status: 400 }
       );
     }
 
@@ -29,15 +22,15 @@ export async function POST(request: NextRequest) {
 
     if (!storedPasscodeSetting) {
       return NextResponse.json(
-        { success: false, message: "Settings not initialized. Please login first to seed settings." },
-        { status: 400 },
+        { success: false, error: "Settings not initialized. Please login first to seed settings." },
+        { status: 400 }
       );
     }
 
     if (storedPasscodeSetting.value !== currentPassword) {
       return NextResponse.json(
-        { success: false, message: "Current password is incorrect" },
-        { status: 401 },
+        { success: false, error: "Current password is incorrect." },
+        { status: 401 }
       );
     }
 
@@ -46,16 +39,15 @@ export async function POST(request: NextRequest) {
       data: { value: newPassword },
     });
 
-    return NextResponse.json({
-      success: true,
-      message: "Password changed successfully.",
-    });
-  } catch (error) {
-    console.error("Error changing password:", error);
     return NextResponse.json(
-      { success: false, message: "Internal server error" },
-      { status: 500 },
+      { success: true, message: "Password updated successfully." },
+      { status: 200 }
+    );
+  } catch (error: any) {
+    console.error("Change Password Route Error:", error);
+    return NextResponse.json(
+      { success: false, error: "Internal server error" },
+      { status: 500 }
     );
   }
 }
-
