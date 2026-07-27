@@ -71,7 +71,7 @@ export default function HeroSection() {
         <div
           className="w-[40%] h-full bg-cover bg-center relative"
           style={{
-            backgroundImage: `url('/waiter.jpg')`,
+            backgroundImage: `url('/malewaiter.jpg')`,
             backgroundPosition: "center 20%",
           }}
         >
@@ -105,58 +105,62 @@ export default function HeroSection() {
 
       {/* 3. HERO CONTENT - Refined Typography & Layout */}
       <div className="absolute inset-0 flex items-center z-10 px-4 sm:px-8 md:px-12 lg:px-16">
-        <div className="max-w-2xl w-full space-y-3 md:space-y-4">
-          {/* Pre-title with accent line */}
-          <div className="flex items-center gap-3 mb-2 animate-float">
-            <span className="w-12 h-[2px] bg-emerald-400/60" />
-            <span className="text-xs font-bold tracking-[0.3em] uppercase text-white/80">
-              {language === "en"
-                ? "Premium Dining"
-                : language === "am"
-                  ? "ከፍተኛ ምግብ"
-                  : "Nyaata Addaa"}
-            </span>
+        <div className="max-w-2xl w-full flex flex-col justify-between">
+          <div>
+            {/* Pre-title with accent line */}
+            <div className="flex items-center gap-3 mb-2 animate-float">
+              <span className="w-12 h-[2px] bg-emerald-400/60" />
+              <span className="text-xs font-bold tracking-[0.3em] uppercase text-white/80">
+                {language === "en"
+                  ? "Premium Dining"
+                  : language === "am"
+                    ? "ከፍተኛ ምግብ"
+                    : "Nyaata Addaa"}
+              </span>
+            </div>
+
+            {/* Main Title with enhanced hierarchy */}
+            <div className="space-y-1">
+              <span className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] block leading-none">
+                {language === "en"
+                  ? "WELCOME TO"
+                  : language === "am"
+                    ? "እንኳን ደህና መጡ"
+                    : "BAGA NAGAAN DHUFTAN"}
+              </span>
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-none drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)]">
+                <span className="text-gradient">OROMIA GARDEN</span>
+              </h1>
+              <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-wide text-white/90 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] block">
+                RESTAURANT
+              </span>
+            </div>
+
+            {/* Divider */}
+            <div className="w-20 h-[3px] bg-gradient-to-r from-emerald-400 to-transparent my-3 rounded-full" />
           </div>
 
-          {/* Main Title with enhanced hierarchy */}
-          <div className="space-y-1">
-            <span className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] block leading-none">
+          <div className="mt-12 sm:mt-16 md:mt-24 space-y-4">
+            {/* Subtitle with enhanced presence */}
+            <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light text-emerald-300/90 leading-tight drop-shadow-[0_3px_10px_rgba(0,0,0,0.9)] italic">
               {language === "en"
-                ? "WELCOME TO"
+                ? "What would you like to order?"
                 : language === "am"
-                  ? "እንኳን ደህና መጡ"
-                  : "BAGA NAGAAN DHUFTAN"}
-            </span>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-none drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)]">
-              <span className="text-gradient">OROMIA GARDEN</span>
-            </h1>
-            <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-wide text-white/90 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] block">
-              RESTAURANT
-            </span>
+                  ? "ምን ልታዘዝ?"
+                  : "Maal isiniif Dhiheessina?"}
+            </p>
+
+            {/* Description - hidden on mobile, visible on larger screens */}
+            <p className="hidden md:block text-base lg:text-lg text-white/70 max-w-md leading-relaxed mt-2 glass-panel p-4 rounded-xl">
+              {t.subWelcome}
+            </p>
+
+            {/* CTA Button - hidden on mobile, visible on larger screens */}
+            <button className="hidden md:flex items-center gap-2 px-8 py-3.5 glass-panel rounded-full text-emerald-300 font-medium hover:bg-emerald-500/20 hover:text-white transition-all duration-300 group mt-4">
+              <span>{t.cta}</span>
+              <ChevronRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
+            </button>
           </div>
-
-          {/* Divider */}
-          <div className="w-20 h-[3px] bg-gradient-to-r from-emerald-400 to-transparent my-3 rounded-full" />
-
-          {/* Subtitle with enhanced presence */}
-          <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light text-emerald-300/90 leading-tight drop-shadow-[0_3px_10px_rgba(0,0,0,0.9)] italic">
-            {language === "en"
-              ? "What would you like to order?"
-              : language === "am"
-                ? "ምን ልታዘዝ?"
-                : "Maal isiniif Dhiheessina?"}
-          </p>
-
-          {/* Description - hidden on mobile, visible on larger screens */}
-          <p className="hidden md:block text-base lg:text-lg text-white/70 max-w-md leading-relaxed mt-2 glass-panel p-4 rounded-xl">
-            {t.subWelcome}
-          </p>
-
-          {/* CTA Button - hidden on mobile, visible on larger screens */}
-          <button className="hidden md:flex items-center gap-2 px-8 py-3.5 glass-panel rounded-full text-emerald-300 font-medium hover:bg-emerald-500/20 hover:text-white transition-all duration-300 group mt-4">
-            <span>{t.cta}</span>
-            <ChevronRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
-          </button>
         </div>
       </div>
 
