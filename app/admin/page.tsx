@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { ADMIN_PASSCODE } from "@/lib/adminConfig";
 import { toast } from "react-hot-toast";
 
 // Module Components
@@ -199,16 +198,28 @@ export default function AdminPage() {
     return () => clearInterval(pollInterval);
   }, [isAuthenticated]);
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (passcode === ADMIN_PASSCODE) {
-      setIsAuthenticated(true);
-      sessionStorage.setItem("admin_auth", "true");
-      setAuthError("");
-      toast.success("Welcome back, manager!");
-    } else {
-      setAuthError("Incorrect passcode. Access Denied.");
-      toast.error("Incorrect Passcode!");
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ passcode }),
+      });
+      const data = await res.json();
+      
+      if (data.success) {
+        setIsAuthenticated(true);
+        sessionStorage.setItem("admin_auth", "true");
+        setAuthError("");
+        toast.success("Welcome back, manager!");
+      } else {
+        setAuthError(data.error || "Incorrect passcode. Access Denied.");
+        toast.error("Incorrect Passcode!");
+      }
+    } catch (err) {
+      setAuthError("Server error. Please try again later.");
+      toast.error("Login failed due to server error.");
     }
   };
 
