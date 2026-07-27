@@ -37,7 +37,14 @@ const t = {
     special: "special",
     noItems: "No dishes found matching your selection.",
     callWaiter: "Call Waiter",
-    currency: "ETB"
+    currency: "ETB",
+    subAll: "all",
+    breakfast: "breakfast",
+    lunch: "lunch",
+    snack: "snack",
+    dinner: "dinner",
+    cold: "cold drink",
+    hot: "hot drink"
   },
   am: {
     searchPlaceholder: "ፈልግ",
@@ -47,7 +54,14 @@ const t = {
     special: "ልዩ",
     noItems: "የመረጡት ምግብ አልተገኘም።",
     callWaiter: "አስተናጋጅ ጥራ",
-    currency: "ብር"
+    currency: "ብር",
+    subAll: "ሁሉም",
+    breakfast: "ቁርስ",
+    lunch: "ምሳ",
+    snack: "መክሰስ",
+    dinner: "እራት",
+    cold: "ቀዝቃዛ",
+    hot: "ትኩስ"
   },
   or: {
     searchPlaceholder: "barbaadi",
@@ -57,7 +71,14 @@ const t = {
     special: "addaa",
     noItems: "Wanti ati filatte hin argamne.",
     callWaiter: "Wami Eegataa",
-    currency: "ETB"
+    currency: "ETB",
+    subAll: "hundaa",
+    breakfast: "ciree",
+    lunch: "laaqana",
+    snack: "caccabsaa",
+    dinner: "irbaata",
+    cold: "qabbanaa'aa",
+    hot: "ho'aa"
   }
 };
 
@@ -109,10 +130,10 @@ export default function ClientHomePage() {
 
     setIsSendingCall(true);
     try {
-      const res = await fetch("/api/admin/notifications", {
+      const res = await fetch("/api/waiter-call", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tableNumber }),
+        body: JSON.stringify({ tableNo: tableNumber }),
       });
       const data = await res.json();
       if (data.success) {
@@ -130,12 +151,15 @@ export default function ClientHomePage() {
     }
   };
 
-  const currentT = t[language];
+  const currentT = t[language as keyof typeof t] || t.en;
 
   // Filtering based on active Subcategories
   const filteredItems = items.filter((item) => {
     if (subCategory === "all") return true;
-    return item.subCategory.toLowerCase() === subCategory.toLowerCase();
+    return (
+      item.subCategory.toLowerCase() === subCategory.toLowerCase() ||
+      item.subCategory.toLowerCase() === "common"
+    );
   });
 
   return (
@@ -156,12 +180,12 @@ export default function ClientHomePage() {
               placeholder={currentT.searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 bg-black border border-neutral-800 rounded-full text-xs font-semibold focus:outline-none focus:border-emerald-500 placeholder-neutral-400 text-center text-neutral-100"
+              className="w-full pl-9 pr-3 py-2 bg-black/60 backdrop-blur-md border border-white/10 rounded-full text-xs font-semibold focus:outline-none focus:border-emerald-500/50 placeholder-neutral-500 text-center text-neutral-100 shadow-inner transition-all"
             />
           </div>
 
           {/* Categories Capsule */}
-          <div className="flex items-center gap-1.5 bg-black border border-neutral-800 rounded-full p-1 flex-1 overflow-x-auto scrollbar-none justify-between">
+          <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-md border border-white/10 rounded-full p-1 flex-1 overflow-x-auto scrollbar-none justify-between shadow-inner">
             {[
               { id: "all", label: currentT.all },
               { id: "food", label: currentT.food },
@@ -176,10 +200,10 @@ export default function ClientHomePage() {
                     setMainCategory(cat.id as any);
                     setSubCategory("all"); // reset sub-category on change
                   }}
-                  className={`px-3 py-1.5 rounded-full text-[11px] font-black tracking-wide uppercase transition-all whitespace-nowrap ${
+                  className={`px-3 py-1.5 rounded-full text-[11px] font-black tracking-wide uppercase transition-all duration-300 whitespace-nowrap ${
                     isActive
-                      ? "bg-white text-black font-extrabold"
-                      : "text-neutral-400 hover:text-neutral-200"
+                      ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md shadow-emerald-500/20"
+                      : "text-neutral-400 hover:text-white hover:bg-white/5"
                   }`}
                 >
                   {cat.label}
@@ -190,25 +214,25 @@ export default function ClientHomePage() {
         </div>
 
         {/* Row 2: Subcategories List (Breakfast, Lunch, Snack, Dinner, Cold, Hot) */}
-        <div className="flex items-center gap-4 overflow-x-auto no-scrollbar py-1 px-1">
+        <div className="flex items-center gap-4 overflow-x-auto no-scrollbar py-2 px-1">
           {[
-            { id: "all", label: "all" },
-            { id: "breakfast", label: "breakfast" },
-            { id: "lunch", label: "lunch" },
-            { id: "snack", label: "snack" },
-            { id: "dinner", label: "dinner" },
-            { id: "cold", label: "cold drink" },
-            { id: "hot", label: "hot drink" }
+            { id: "all", label: currentT.subAll },
+            { id: "breakfast", label: currentT.breakfast },
+            { id: "lunch", label: currentT.lunch },
+            { id: "snack", label: currentT.snack },
+            { id: "dinner", label: currentT.dinner },
+            { id: "cold", label: currentT.cold },
+            { id: "hot", label: currentT.hot }
           ].map((sub) => {
             const isActive = subCategory === sub.id;
             return (
               <button
                 key={sub.id}
                 onClick={() => setSubCategory(sub.id)}
-                className={`text-xs font-semibold uppercase whitespace-nowrap transition-all ${
+                className={`text-xs font-semibold uppercase whitespace-nowrap transition-all duration-300 ${
                   isActive
-                    ? "text-emerald-400 font-extrabold border-b-2 border-emerald-400 pb-0.5"
-                    : "text-neutral-500 hover:text-neutral-300"
+                    ? "text-emerald-400 font-extrabold border-b-2 border-emerald-400 pb-1"
+                    : "text-neutral-500 hover:text-neutral-300 hover:border-b-2 hover:border-neutral-700 pb-1"
                 }`}
               >
                 {sub.label}
