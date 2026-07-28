@@ -18,8 +18,8 @@ interface MenuContextType {
   setMainCategory: (category: MainCategory) => void;
   subCategory: string;
   setSubCategory: (sub: string) => void;
-  maxPrice: number;
-  setMaxPrice: (price: number) => void;
+  priceRange: string;
+  setPriceRange: (range: string) => void;
 }
 
 // Create Context with a default undefined state
@@ -34,7 +34,7 @@ export function MenuProvider({ children }: MenuProviderProps) {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [mainCategory, setMainCategory] = useState<MainCategory>("all");
   const [subCategory, setSubCategory] = useState<string>("all");
-  const [maxPrice, setMaxPrice] = useState<number>(1500);
+  const [priceRange, setPriceRange] = useState<string>("all");
 
   return (
     <MenuContext.Provider
@@ -47,8 +47,8 @@ export function MenuProvider({ children }: MenuProviderProps) {
         setMainCategory,
         subCategory,
         setSubCategory,
-        maxPrice,
-        setMaxPrice,
+        priceRange,
+        setPriceRange,
       }}
     >
       {children}
