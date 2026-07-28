@@ -132,10 +132,12 @@ export default function AdminPage() {
       // 2. Clear out any previous audio queue chunks to prevent backlog stuttering
       window.speechSynthesis.cancel();
       
-      const alertPhrase = `ጠረጴዛ ቁጥር ${tableNum} አስተናጋጅ እየጠራ ነው።`;
+      // Use phonetic spelling so default English TTS engines can pronounce the Amharic phrase audibly.
+      // Most devices do not have an Amharic voice installed, causing native script to be completely silent.
+      const alertPhrase = `Te-re-pe-za ku-ter ${tableNum}, as-te-na-gaj y-te-ral.`;
       const utterance = new SpeechSynthesisUtterance(alertPhrase);
-      utterance.lang = "am-ET";
-      utterance.rate = 0.90;
+      utterance.lang = "en-US"; // Use English engine to read phonetic Amharic
+      utterance.rate = 0.85;
       window.speechSynthesis.speak(utterance);
     }
   };
