@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useMenu } from "@/context/MenuContext";
 import HeroSection from "@/components/HeroSection"; // Make sure your HeroSection component is saved in src/components/HeroSection.tsx
-import { Search, Flame, Coffee, Pizza, Sparkles, Bell, X } from "lucide-react";
+import { Search, Flame, Coffee, Pizza, Sparkles, Bell, X, Leaf, Star } from "lucide-react";
 
 interface MenuItem {
   id: string;
@@ -16,6 +16,7 @@ interface MenuItem {
   price: number;
   imageUrl: string;
   subCategory: string;
+  categoryId: string;
   isAvailable: boolean;
 }
 
@@ -44,7 +45,15 @@ const t = {
     snack: "snack",
     dinner: "dinner",
     cold: "cold drink",
-    hot: "hot drink"
+    hot: "hot drink",
+    fasting: "Fasting",
+    traditional: "Traditional",
+    callWaiterModalTitle: "Call a Waiter",
+    enterTableNumber: "Enter Your Table Number",
+    confirmCall: "Confirm & Call Now",
+    sendingCall: "Sending alert...",
+    waiterOnTheWay: "Waiter is on the way!",
+    waiterNotifiedDesc: "We have notified the counter of Table"
   },
   am: {
     searchPlaceholder: "ፈልግ",
@@ -61,7 +70,15 @@ const t = {
     snack: "መክሰስ",
     dinner: "እራት",
     cold: "ቀዝቃዛ",
-    hot: "ትኩስ"
+    hot: "ትኩስ",
+    fasting: "የጾም",
+    traditional: "ባህላዊ",
+    callWaiterModalTitle: "አስተናጋጅ ጥራ",
+    enterTableNumber: "የጠረጴዛ ቁጥርዎን ያስገቡ",
+    confirmCall: "አረጋግጥ እና ጥራ",
+    sendingCall: "በመላክ ላይ...",
+    waiterOnTheWay: "አስተናጋጅ በመምጣት ላይ ነው!",
+    waiterNotifiedDesc: "ለጠረጴዛ ቁጥር አስተናጋጅ አሳውቀናል"
   },
   or: {
     searchPlaceholder: "barbaadi",
@@ -78,7 +95,15 @@ const t = {
     snack: "caccabsaa",
     dinner: "irbaata",
     cold: "qabbanaa'aa",
-    hot: "ho'aa"
+    hot: "ho'aa",
+    fasting: "tsooma",
+    traditional: "aadaa",
+    callWaiterModalTitle: "Wami Eegataa",
+    enterTableNumber: "Lakkoofsa Teessuma Keessanii Galchaa",
+    confirmCall: "Mirkaneessi & Wami",
+    sendingCall: "Eergama jira...",
+    waiterOnTheWay: "Eegataan dhufaa jira!",
+    waiterNotifiedDesc: "Teessuma eegataaf beeksifneerra"
   }
 };
 
@@ -96,6 +121,13 @@ export default function ClientHomePage() {
   const [items, setItems] = useState<MenuItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const categorySlugMap = useMemo(() => {
+    return categories.reduce((acc, cat) => {
+      acc[cat.id] = cat.slug;
+      return acc;
+    }, {} as Record<string, string>);
+  }, [categories]);
 
   // Waiter Call State
   const [isCallingWaiter, setIsCallingWaiter] = useState(false);
@@ -153,20 +185,22 @@ export default function ClientHomePage() {
 
   const currentT = t[language as keyof typeof t] || t.en;
 
-  // Filtering based on active Subcategories
-  const filteredItems = items.filter((item) => {
-    if (subCategory === "all") return true;
+  // Filtering based on active Subcategories + sort by price ascending
+  const filteredItems = items
+    .filter((item) => {
+      if (subCategory === "all") return true;
 
-    const isDrinkTab = ["cold", "hot"].includes(subCategory.toLowerCase());
-    const isCommon = item.subCategory.toLowerCase() === "common";
+      const isDrinkTab = ["cold", "hot"].includes(subCategory.toLowerCase());
+      const isCommon = item.subCategory.toLowerCase() === "common";
 
-    if (isCommon) {
-      // Common items only propagate to time-based tabs (breakfast, lunch, dinner, snack)
-      return !isDrinkTab;
-    }
+      if (isCommon) {
+        // Common items only propagate to time-based tabs (breakfast, lunch, dinner, snack)
+        return !isDrinkTab;
+      }
 
-    return item.subCategory.toLowerCase() === subCategory.toLowerCase();
-  });
+      return item.subCategory.toLowerCase() === subCategory.toLowerCase();
+    })
+    .sort((a, b) => a.price - b.price);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-neutral-900 via-neutral-950 to-neutral-950 text-neutral-100 pb-28">
@@ -193,17 +227,18 @@ export default function ClientHomePage() {
           {/* Categories Capsule */}
           <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-md border border-white/10 rounded-full p-1 flex-1 overflow-x-auto scrollbar-none justify-between shadow-inner">
             {[
-              { id: "all", label: currentT.all },
-              { id: "food", label: currentT.food },
-              { id: "drinks", label: currentT.drinks },
-              { id: "special", label: currentT.special }
+              { slug: "all", label: currentT.all },
+              ...categories.map((c) => ({
+                slug: c.slug,
+                label: currentT[c.slug as keyof typeof currentT] || c.nameEN,
+              })),
             ].map((cat) => {
-              const isActive = mainCategory === cat.id;
+              const isActive = mainCategory === cat.slug;
               return (
                 <button
-                  key={cat.id}
+                  key={cat.slug}
                   onClick={() => {
-                    setMainCategory(cat.id as any);
+                    setMainCategory(cat.slug);
                     setSubCategory("all"); // reset sub-category on change
                   }}
                   className={`px-3 py-1.5 rounded-full text-[11px] font-black tracking-wide uppercase transition-all duration-300 whitespace-nowrap ${
@@ -228,7 +263,9 @@ export default function ClientHomePage() {
             { id: "snack", label: currentT.snack },
             { id: "dinner", label: currentT.dinner },
             { id: "cold", label: currentT.cold },
-            { id: "hot", label: currentT.hot }
+            { id: "hot", label: currentT.hot },
+            { id: "fasting", label: currentT.fasting },
+            { id: "traditional", label: currentT.traditional }
           ].map((sub) => {
             const isActive = subCategory === sub.id;
             return (
@@ -266,7 +303,7 @@ export default function ClientHomePage() {
             <p className="text-xs font-bold tracking-wide">{currentT.noItems}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {filteredItems.map((item) => {
               const localizedName = 
                 language === "am" ? item.nameAM : 
@@ -277,6 +314,11 @@ export default function ClientHomePage() {
                 language === "am" ? item.descAM : 
                 language === "or" ? item.descOR : 
                 item.descEN;
+
+              const categorySlug = categorySlugMap[item.categoryId];
+              const isSpecial = categorySlug === "special";
+              const isFasting = categorySlug === "fasting";
+              const isTraditional = categorySlug === "traditional";
 
               return (
                 <div
@@ -295,6 +337,24 @@ export default function ClientHomePage() {
                             "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400";
                         }}
                       />
+                      {isSpecial && (
+                        <div className="absolute top-2 left-2 z-10 bg-emerald-500 text-neutral-950 font-black text-[9px] px-2 py-0.5 rounded-full flex items-center gap-1 shadow-lg shadow-emerald-500/30 uppercase tracking-widest scale-90 origin-top-left animate-pulse">
+                          <Sparkles className="w-2.5 h-2.5" />
+                          <span>Special</span>
+                        </div>
+                      )}
+                      {isFasting && (
+                        <div className="absolute top-2 left-2 z-10 bg-blue-600 text-white font-black text-[9px] px-2 py-0.5 rounded-full flex items-center gap-1 shadow-lg shadow-blue-500/30 uppercase tracking-widest scale-90 origin-top-left">
+                          <Leaf className="w-2.5 h-2.5" />
+                          <span>{currentT.fasting}</span>
+                        </div>
+                      )}
+                      {isTraditional && (
+                        <div className="absolute top-2 left-2 z-10 bg-amber-500 text-neutral-950 font-black text-[9px] px-2 py-0.5 rounded-full flex items-center gap-1 shadow-lg shadow-amber-500/30 uppercase tracking-widest scale-90 origin-top-left">
+                          <Star className="w-2.5 h-2.5" />
+                          <span>{currentT.traditional}</span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Meta Text */}
@@ -335,7 +395,7 @@ export default function ClientHomePage() {
           <div className="absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={() => setIsCallingWaiter(false)} />
           <div className="relative bg-neutral-950 border-t border-neutral-800 w-full max-w-md rounded-t-[32px] p-6 z-10">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-black">Call a Waiter</h2>
+              <h2 className="text-lg font-black">{currentT.callWaiterModalTitle}</h2>
               <button
                 onClick={() => setIsCallingWaiter(false)}
                 className="w-8 h-8 flex items-center justify-center bg-neutral-900 border border-neutral-800 rounded-full text-neutral-400"
@@ -349,14 +409,14 @@ export default function ClientHomePage() {
                 <div className="w-12 h-12 bg-emerald-500/10 border border-emerald-500/30 rounded-full flex items-center justify-center text-emerald-400 mx-auto">
                   ✓
                 </div>
-                <h3 className="font-bold text-neutral-100">Waiter is on the way!</h3>
-                <p className="text-xs text-neutral-500">We have notified the counter of Table {tableNumber}.</p>
+                <h3 className="font-bold text-neutral-100">{currentT.waiterOnTheWay}</h3>
+                <p className="text-xs text-neutral-500">{currentT.waiterNotifiedDesc} {tableNumber}.</p>
               </div>
             ) : (
               <form onSubmit={handleCallWaiter} className="space-y-5 pb-6">
                 <div>
                   <label className="text-xs text-neutral-500 font-bold uppercase block mb-2 text-center">
-                    Enter Your Table Number
+                    {currentT.enterTableNumber}
                   </label>
                   <input
                     type="number"
@@ -373,7 +433,7 @@ export default function ClientHomePage() {
                   disabled={isSendingCall}
                   className="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-neutral-950 font-black rounded-2xl text-xs uppercase tracking-wider active:scale-95 transition-transform"
                 >
-                  {isSendingCall ? "Sending alert..." : "Confirm & Call Now"}
+                  {isSendingCall ? currentT.sendingCall : currentT.confirmCall}
                 </button>
               </form>
             )}

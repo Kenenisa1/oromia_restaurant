@@ -205,12 +205,14 @@ export default function MenuFormModal({
               >
                 <option value="all">None</option>
                 <option value="common">Common (All Day)</option>
-                <option value="breakfast">Breakfast</option>
-                <option value="lunch">Lunch</option>
-                <option value="snack">Snack</option>
-                <option value="dinner">Dinner</option>
-                <option value="cold">Cold Drink</option>
-                <option value="hot">Hot Drink</option>
+                <option value="breakfast">Breakfast / ቁርስ</option>
+                <option value="lunch">Lunch / ምሳ</option>
+                <option value="snack">Snack / መክሰስ</option>
+                <option value="dinner">Dinner / እራት</option>
+                <option value="cold">Cold Drink / ቀዝቃዛ</option>
+                <option value="hot">Hot Drink / ትኩስ</option>
+                <option value="fasting">Fasting / የጾም</option>
+                <option value="traditional">Traditional / ባህላዊ</option>
               </select>
             </div>
           </div>

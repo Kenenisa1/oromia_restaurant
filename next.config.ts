@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    unoptimized: true,
+  },
+  // Suppress Turbopack Prisma junction point warning on Windows
+  // by keeping config clean
 };
 
 export default nextConfig;

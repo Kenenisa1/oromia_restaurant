@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 
 // Prevent multiple Prisma instances in development
@@ -80,10 +80,27 @@ export async function GET(request: Request) {
 
     const queryConditions = andConditions.length > 0 ? { AND: andConditions } : {};
 
-    const [menuItems, categories] = await Promise.all([
-      prisma.menuItem.findMany({ where: queryConditions }),
-      prisma.category.findMany(),
-    ]);
+    let categories = await prisma.category.findMany();
+    const requiredCategories = [
+      { slug: "food", nameEN: "Food", nameAM: "ምግቦች", nameOR: "Nyaata" },
+      { slug: "drinks", nameEN: "Drinks", nameAM: "መጠጦች", nameOR: "Dhugaatii" },
+      { slug: "special", nameEN: "Special", nameAM: "ልዩ", nameOR: "Addaa" },
+      { slug: "fasting", nameEN: "Fasting", nameAM: "የጾም", nameOR: "Tsooma" },
+      { slug: "traditional", nameEN: "Traditional", nameAM: "ባህላዊ", nameOR: "Aadaa" },
+    ];
+
+    let needsRefetch = false;
+    for (const req of requiredCategories) {
+      if (!categories.some((c) => c.slug === req.slug)) {
+        await prisma.category.create({ data: req });
+        needsRefetch = true;
+      }
+    }
+    if (needsRefetch) {
+      categories = await prisma.category.findMany();
+    }
+
+    const menuItems = await prisma.menuItem.findMany({ where: queryConditions });
 
     const result = { success: true, menuItems, categories };
     setCache(cacheKey, result);

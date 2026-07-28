@@ -132,9 +132,10 @@ export default function AdminPage() {
       // 2. Clear out any previous audio queue chunks to prevent backlog stuttering
       window.speechSynthesis.cancel();
       
-      const alertPhrase = `Table number ${tableNum} is calling the waiter.`;
+      const alertPhrase = `ጠረጴዛ ቁጥር ${tableNum} አስተናጋጅ እየጠራ ነው።`;
       const utterance = new SpeechSynthesisUtterance(alertPhrase);
-      utterance.rate = 0.95;
+      utterance.lang = "am-ET";
+      utterance.rate = 0.90;
       window.speechSynthesis.speak(utterance);
     }
   };

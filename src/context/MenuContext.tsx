@@ -2,8 +2,8 @@
 
 import React, { createContext, useContext, useState } from "react";
 
-// Definitions for supported main category slugs
-export type MainCategory = "all" | "food" | "drinks" | "special";
+// Definitions for supported main category slugs (now open to DB-driven slugs)
+export type MainCategory = string;
 
 // Supported languages
 export type Language = "en" | "am" | "or";
