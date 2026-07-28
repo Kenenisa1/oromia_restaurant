@@ -20,7 +20,7 @@ interface MenuItem {
 }
 
 export default function MenuGrid() {
-  const { language, mainCategory, subCategory, searchQuery, maxPrice } =
+  const { language, mainCategory, subCategory, searchQuery, priceRange } =
     useMenu();
   const [items, setItems] = useState<MenuItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -32,7 +32,6 @@ export default function MenuGrid() {
       try {
         const activeCategory = mainCategory || "all";
         const activeSearch = searchQuery || "";
-        const activeMaxPrice = maxPrice ? maxPrice.toString() : "9999";
 
         // NOTICE: We explicitly DO NOT send 'subCategory' to the backend.
         // This lets the backend return all items under this category so our
@@ -40,7 +39,6 @@ export default function MenuGrid() {
         const params = new URLSearchParams({
           category: activeCategory,
           search: activeSearch,
-          maxPrice: activeMaxPrice,
         });
 
         console.log(
@@ -67,7 +65,7 @@ export default function MenuGrid() {
 
     return () => clearTimeout(delayDebounce);
     // CRITICAL: We added subCategory here so the component tracks tab switches instantly
-  }, [mainCategory, subCategory, searchQuery, maxPrice]);
+  }, [mainCategory, subCategory, searchQuery]);
 
   // ========================================================
   // Smart "Common" Filtering Logic (Client-Side)
@@ -76,19 +74,25 @@ export default function MenuGrid() {
     // 1. Only render if manually set to available
     if (!item.isAvailable) return false;
 
-    // NOTE: Items should show even if stockQuantity is 0 (not set for today yet)
-    // The daily stock is just for tracking admin's daily inventory setup
-    // Customers should see all available items regardless of daily stock status
+    // 2. Apply price range filter
+    if (priceRange === "<100" && item.price >= 100) return false;
+    if (priceRange === "100-300" && (item.price < 100 || item.price > 300)) return false;
+    if (priceRange === "300-500" && (item.price < 300 || item.price > 500)) return false;
+    if (priceRange === "500+" && item.price <= 500) return false;
 
     const activeTab = subCategory?.toLowerCase().trim() || "all";
 
-    // 2. If 'all' is selected, show all items
+    // 3. If 'all' is selected, show all items
     if (activeTab === "all") return true;
 
-    // 3. Keep item if it matches the active tab OR is tagged as "common"
+    // 4. Keep item if it matches the active tab OR is tagged as "common"
     const itemSub = item.subCategory?.toLowerCase().trim() || "";
     const isCommon = itemSub === "common";
     const matchesTab = itemSub === activeTab;
+
+    // Common items don't show in fasting/traditional tabs
+    const specialTabs = ["fasting", "traditional"];
+    if (isCommon && specialTabs.includes(activeTab)) return false;
 
     return matchesTab || isCommon;
   });

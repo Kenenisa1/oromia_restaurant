@@ -14,8 +14,8 @@ export default function FilterSection() {
     setMainCategory,
     subCategory,
     setSubCategory,
-    maxPrice,
-    setMaxPrice,
+    priceRange,
+    setPriceRange,
   } = useMenu();
 
   const [showPriceFilter, setShowPriceFilter] = useState(false);
@@ -80,24 +80,22 @@ export default function FilterSection() {
       {showPriceFilter && (
         <div className="mb-4 p-4 rounded-2xl bg-neutral-950 border border-neutral-800 transition-all duration-300">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-xs text-neutral-400 font-medium uppercase tracking-wider">Max Price</span>
+            <span className="text-xs text-neutral-400 font-medium uppercase tracking-wider">Price Range</span>
             <span className="text-sm font-bold text-emerald-400">
-              {maxPrice} {t.etb}
+              {priceRange === "all" ? "All Prices" : priceRange}
             </span>
           </div>
-          <input
-            type="range"
-            min="20"
-            max="1500"
-            step="10"
-            value={maxPrice}
-            onChange={(e) => setMaxPrice(Number(e.target.value))}
-            className="w-full accent-emerald-500 cursor-pointer h-2 bg-neutral-800 rounded-lg appearance-none"
-          />
-          <div className="flex justify-between text-[10px] text-neutral-600 mt-1">
-            <span>20 ETB</span>
-            <span>1500 ETB</span>
-          </div>
+          <select
+            value={priceRange}
+            onChange={(e) => setPriceRange(e.target.value)}
+            className="w-full bg-neutral-900 text-neutral-300 rounded p-2"
+          >
+            <option value="all">All Prices</option>
+            <option value="<100">&lt; 100 ETB</option>
+            <option value="100-300">100 - 300 ETB</option>
+            <option value="300-500">300 - 500 ETB</option>
+            <option value="500+">500+ ETB</option>
+          </select>
         </div>
       )}
 
