@@ -195,7 +195,8 @@ export default function ClientHomePage() {
 
       if (isCommon) {
         // Common items only propagate to time-based tabs (breakfast, lunch, dinner, snack)
-        return !isDrinkTab;
+        const timeTabs = ["breakfast", "lunch", "dinner", "snack"];
+        return timeTabs.includes(subCategory.toLowerCase());
       }
 
       return item.subCategory.toLowerCase() === subCategory.toLowerCase();
@@ -254,34 +255,35 @@ export default function ClientHomePage() {
           </div>
         </div>
 
-        {/* Row 2: Subcategories List (Breakfast, Lunch, Snack, Dinner, Cold, Hot) */}
-        <div className="flex items-center gap-4 overflow-x-auto no-scrollbar py-2 px-1">
-          {[
-            { id: "all", label: currentT.subAll },
-            { id: "breakfast", label: currentT.breakfast },
-            { id: "lunch", label: currentT.lunch },
-            { id: "snack", label: currentT.snack },
-            { id: "dinner", label: currentT.dinner },
-            { id: "cold", label: currentT.cold },
-            { id: "hot", label: currentT.hot },
-            { id: "fasting", label: currentT.fasting },
-            { id: "traditional", label: currentT.traditional }
-          ].map((sub) => {
-            const isActive = subCategory === sub.id;
-            return (
-              <button
-                key={sub.id}
-                onClick={() => setSubCategory(sub.id)}
-                className={`text-xs font-semibold uppercase whitespace-nowrap transition-all duration-300 ${
-                  isActive
-                    ? "text-emerald-400 font-extrabold border-b-2 border-emerald-400 pb-1"
-                    : "text-neutral-500 hover:text-neutral-300 hover:border-b-2 hover:border-neutral-700 pb-1"
-                }`}
-              >
+        {/* Row 2: Subcategories List (Dropdown for mobile optimization) */}
+        <div className="w-full relative py-2">
+          <select
+            value={subCategory}
+            onChange={(e) => setSubCategory(e.target.value)}
+            className="w-full appearance-none bg-black/60 backdrop-blur-md border border-white/10 text-neutral-300 font-semibold text-xs uppercase tracking-widest px-5 py-3 rounded-full focus:outline-none focus:border-emerald-500/50 shadow-inner transition-all"
+          >
+            {[
+              { id: "all", label: currentT.subAll },
+              { id: "breakfast", label: currentT.breakfast },
+              { id: "lunch", label: currentT.lunch },
+              { id: "snack", label: currentT.snack },
+              { id: "dinner", label: currentT.dinner },
+              { id: "cold", label: currentT.cold },
+              { id: "hot", label: currentT.hot },
+              { id: "fasting", label: currentT.fasting },
+              { id: "traditional", label: currentT.traditional }
+            ].map((sub) => (
+              <option key={sub.id} value={sub.id}>
                 {sub.label}
-              </button>
-            );
-          })}
+              </option>
+            ))}
+          </select>
+          {/* Custom Dropdown Arrow */}
+          <div className="absolute inset-y-0 right-5 flex items-center pointer-events-none text-neutral-500">
+            <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </div>
         </div>
       </section>
 
