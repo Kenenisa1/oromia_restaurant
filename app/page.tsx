@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useEffect, useState, useMemo } from "react";
+import Link from "next/link";
 import { useMenu } from "@/context/MenuContext";
 import HeroSection from "@/components/HeroSection"; // Make sure your HeroSection component is saved in src/components/HeroSection.tsx
-import { Search, Flame, Coffee, Pizza, Sparkles, Bell, X, Leaf, Star } from "lucide-react";
+import { Search, Flame, Coffee, Pizza, Sparkles, Bell, X, Leaf, Star, Filter } from "lucide-react";
 
 interface MenuItem {
   id: string;
@@ -37,7 +38,7 @@ const t = {
     drinks: "drinks",
     special: "special",
     noItems: "No dishes found matching your selection.",
-    callWaiter: "Call Waiter",
+    callWaiter: "አስተናጋጅ ጥራ",
     currency: "ETB",
     subAll: "all",
     breakfast: "breakfast",
@@ -48,12 +49,12 @@ const t = {
     hot: "hot drink",
     fasting: "Fasting",
     traditional: "Traditional",
-    callWaiterModalTitle: "Call a Waiter",
-    enterTableNumber: "Enter Your Table Number",
-    confirmCall: "Confirm & Call Now",
-    sendingCall: "Sending alert...",
-    waiterOnTheWay: "Waiter is on the way!",
-    waiterNotifiedDesc: "We have notified the counter of Table"
+    callWaiterModalTitle: "አስተናጋጅ ጥራ",
+    enterTableNumber: "የጠረጴዛ ቁጥርዎን ያስገቡ",
+    confirmCall: "አረጋግጥ እና ጥራ",
+    sendingCall: "በመላክ ላይ...",
+    waiterOnTheWay: "አስተናጋጅ በመምጣት ላይ ነው!",
+    waiterNotifiedDesc: "ለጠረጴዛ ቁጥር አስተናጋጅ አሳውቀናል"
   },
   am: {
     searchPlaceholder: "ፈልግ",
@@ -87,7 +88,7 @@ const t = {
     drinks: "dhugaatii",
     special: "addaa",
     noItems: "Wanti ati filatte hin argamne.",
-    callWaiter: "Wami Eegataa",
+    callWaiter: "አስተናጋጅ ጥራ",
     currency: "ETB",
     subAll: "hundaa",
     breakfast: "ciree",
@@ -98,12 +99,12 @@ const t = {
     hot: "ho'aa",
     fasting: "tsooma",
     traditional: "aadaa",
-    callWaiterModalTitle: "Wami Eegataa",
-    enterTableNumber: "Lakkoofsa Teessuma Keessanii Galchaa",
-    confirmCall: "Mirkaneessi & Wami",
-    sendingCall: "Eergama jira...",
-    waiterOnTheWay: "Eegataan dhufaa jira!",
-    waiterNotifiedDesc: "Teessuma eegataaf beeksifneerra"
+    callWaiterModalTitle: "አስተናጋጅ ጥራ",
+    enterTableNumber: "የጠረጴዛ ቁጥርዎን ያስገቡ",
+    confirmCall: "አረጋግጥ እና ጥራ",
+    sendingCall: "በመላክ ላይ...",
+    waiterOnTheWay: "አስተናጋጅ በመምጣት ላይ ነው!",
+    waiterNotifiedDesc: "ለጠረጴዛ ቁጥር አስተናጋጅ አሳውቀናል"
   }
 };
 
@@ -115,7 +116,9 @@ export default function ClientHomePage() {
     mainCategory, 
     setMainCategory,
     subCategory,
-    setSubCategory
+    setSubCategory,
+    priceRange,
+    setPriceRange
   } = useMenu();
 
   const [items, setItems] = useState<MenuItem[]>([]);
@@ -185,9 +188,19 @@ export default function ClientHomePage() {
 
   const currentT = t[language as keyof typeof t] || t.en;
 
-  // Filtering based on active Subcategories + sort by price ascending
+  // Filtering based on active Subcategories + sort by price ascending + price range filter
   const filteredItems = items
     .filter((item) => {
+      // 1. Price Range filter
+      let matchesPrice = true;
+      if (priceRange === "<100") matchesPrice = item.price < 100;
+      else if (priceRange === "100-300") matchesPrice = item.price >= 100 && item.price <= 300;
+      else if (priceRange === "300-500") matchesPrice = item.price >= 300 && item.price <= 500;
+      else if (priceRange === "500+") matchesPrice = item.price > 500;
+
+      if (!matchesPrice) return false;
+
+      // 2. Subcategory Filter
       if (subCategory === "all") return true;
 
       const isDrinkTab = ["cold", "hot"].includes(subCategory.toLowerCase());
@@ -255,34 +268,59 @@ export default function ClientHomePage() {
           </div>
         </div>
 
-        {/* Row 2: Subcategories List (Dropdown for mobile optimization) */}
-        <div className="w-full relative py-2">
-          <select
-            value={subCategory}
-            onChange={(e) => setSubCategory(e.target.value)}
-            className="w-full appearance-none bg-black/60 backdrop-blur-md border border-white/10 text-neutral-300 font-semibold text-xs uppercase tracking-widest px-5 py-3 rounded-full focus:outline-none focus:border-emerald-500/50 shadow-inner transition-all"
-          >
-            {[
-              { id: "all", label: currentT.subAll },
-              { id: "breakfast", label: currentT.breakfast },
-              { id: "lunch", label: currentT.lunch },
-              { id: "snack", label: currentT.snack },
-              { id: "dinner", label: currentT.dinner },
-              { id: "cold", label: currentT.cold },
-              { id: "hot", label: currentT.hot },
-              { id: "fasting", label: currentT.fasting },
-              { id: "traditional", label: currentT.traditional }
-            ].map((sub) => (
-              <option key={sub.id} value={sub.id}>
-                {sub.label}
-              </option>
-            ))}
-          </select>
-          {/* Custom Dropdown Arrow */}
-          <div className="absolute inset-y-0 right-5 flex items-center pointer-events-none text-neutral-500">
-            <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
+        {/* Row 2: Subcategories List & Price Filter Dropdowns */}
+        <div className="flex gap-2 w-full relative py-2">
+          {/* Subcategory Dropdown */}
+          <div className="relative w-1/2">
+            <select
+              value={subCategory}
+              onChange={(e) => setSubCategory(e.target.value)}
+              className="w-full appearance-none bg-black/60 backdrop-blur-md border border-white/10 text-neutral-300 font-semibold text-xs uppercase tracking-widest px-4 py-3 rounded-full focus:outline-none focus:border-emerald-500/50 shadow-inner transition-all"
+            >
+              {[
+                { id: "all", label: currentT.subAll },
+                { id: "breakfast", label: currentT.breakfast },
+                { id: "lunch", label: currentT.lunch },
+                { id: "snack", label: currentT.snack },
+                { id: "dinner", label: currentT.dinner },
+                { id: "cold", label: currentT.cold },
+                { id: "hot", label: currentT.hot },
+                { id: "fasting", label: currentT.fasting },
+                { id: "traditional", label: currentT.traditional }
+              ].map((sub) => (
+                <option key={sub.id} value={sub.id}>
+                  {sub.label}
+                </option>
+              ))}
+            </select>
+            <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-neutral-500">
+              <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Price Range Dropdown */}
+          <div className="relative w-1/2">
+            <div className="absolute left-3 top-3">
+              <Filter className="w-3.5 h-3.5 text-neutral-400" />
+            </div>
+            <select
+              value={priceRange}
+              onChange={(e) => setPriceRange(e.target.value)}
+              className="w-full appearance-none bg-black/60 backdrop-blur-md border border-white/10 text-neutral-300 font-semibold text-xs uppercase tracking-widest pl-9 pr-4 py-3 rounded-full focus:outline-none focus:border-emerald-500/50 shadow-inner transition-all"
+            >
+              <option value="all">All Prices</option>
+              <option value="<100">&lt; 100 ETB</option>
+              <option value="100-300">100 - 300 ETB</option>
+              <option value="300-500">300 - 500 ETB</option>
+              <option value="500+">500+ ETB</option>
+            </select>
+            <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-neutral-500">
+              <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </div>
           </div>
         </div>
       </section>
@@ -323,7 +361,8 @@ export default function ClientHomePage() {
               const isTraditional = categorySlug === "traditional";
 
               return (
-                <div
+                <Link
+                  href={`/item/${item.id}`}
                   key={item.id}
                   className="bg-neutral-900/50 border border-neutral-850/80 rounded-[28px] p-3 flex flex-col justify-between hover:border-emerald-500/20 transition-all duration-300"
                 >
@@ -364,7 +403,7 @@ export default function ClientHomePage() {
                       <h3 className="text-xs font-black text-neutral-50 line-clamp-1">
                         {localizedName}
                       </h3>
-                      <p className="text-[10px] text-neutral-500 line-clamp-2 mt-1 leading-relaxed">
+                      <p className="text-[10px] text-neutral-500 font-semibold line-clamp-2 mt-1 leading-relaxed">
                         {localizedDesc || "Deliciously prepared fresh local dish."}
                       </p>
                     </div>
@@ -375,7 +414,7 @@ export default function ClientHomePage() {
                       {item.price} <span className="text-[9px] font-bold">{currentT.currency}</span>
                     </span>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>
