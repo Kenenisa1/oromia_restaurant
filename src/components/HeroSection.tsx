@@ -252,7 +252,7 @@ export default function HeroSection() {
                   <div>
                     <p className="text-sm font-medium">Location</p>
                     <p className="text-xs text-white/50">
-                      Bole, near Millennium Hall, Addis Ababa
+                      Bishan Guracha, infront of Party Beruou , Shashamene, Oromia.  
                     </p>
                   </div>
                 </div>
@@ -260,7 +260,7 @@ export default function HeroSection() {
                   <Phone className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm font-medium">Contact</p>
-                    <p className="text-xs text-white/50">+251 911 00 0000</p>
+                    <p className="text-xs text-white/50">+251 904 820 541</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
@@ -268,21 +268,10 @@ export default function HeroSection() {
                   <div>
                     <p className="text-sm font-medium">Hours</p>
                     <p className="text-xs text-white/50">
-                      Mon - Sun: 10:00 AM - 11:00 PM
+                      Sun - Fri: 1:00 AM - 12:00 PM
                     </p>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            {/* Rating/Feature Badge */}
-            <div className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 to-transparent border border-emerald-500/20">
-              <Award className="w-8 h-8 text-emerald-400" />
-              <div>
-                <p className="text-sm font-bold">Award Winning Cuisine</p>
-                <p className="text-xs text-white/40">
-                  Authentic Ethiopian flavors since 2010
-                </p>
               </div>
             </div>
           </div>
